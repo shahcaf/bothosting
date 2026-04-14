@@ -229,9 +229,22 @@ app.use('/api/monitor', require('./routes/monitor'));
 app.use('/api/files', require('./routes/files'));
 app.use('/api/admin', require('./routes/admin'));
 
+// Keep-alive endpoint to prevent the host from sleeping on cloud deployments
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    
+    // Internal Keep-Alive interval (every 14 minutes)
+    // Helps prevent the server from sleeping on Render/Railway free tiers
+    setInterval(() => {
+      const url = process.env.RENDER_EXTERNAL_URL || process.env.RAILWAY_STATIC_URL || `http://localhost:${PORT}`;
+      const axios = require('axios');
+      axios.get(`${url}/api/ping`).catch(() => {});
+    }, 14 * 60 * 1000);
     
     // Auto-resume active bots seamlessly on host reboot
     try {

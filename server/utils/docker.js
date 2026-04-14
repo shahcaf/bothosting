@@ -139,14 +139,29 @@ class LocalProcessManager {
       if (io) io.to(`bot-${bot.id}`).emit('bot-log', { botId: bot.id, message: `[SYSTEM] Process exited with code ${code}`, timestamp: new Date() });
       if (pool) {
         try { 
-          await pool.query("UPDATE bots SET status = 'stopped' WHERE id = $1", [bot.id]); 
+          // Fetch settings to check alert and auto restart preferences
+          const { rows } = await pool.query('SELECT alert_email, alerts_enabled, auto_restart FROM monitor_settings WHERE user_id = $1', [bot.owner_id]);
+          let shouldRestart = false;
           
-          // Send crash alert if code != 0 and user has alerts enabled
-          if (code !== 0) {
-            const { rows } = await pool.query('SELECT alert_email, alerts_enabled FROM monitor_settings WHERE user_id = $1', [bot.owner_id]);
-            if (rows.length > 0 && rows[0].alerts_enabled && rows[0].alert_email) {
-              await sendCrashAlert(rows[0].alert_email, bot.name, code);
+          if (rows.length > 0) {
+            const settings = rows[0];
+            shouldRestart = settings.auto_restart;
+
+            // Send crash alert if code != 0 and user has alerts enabled
+            if (code !== 0 && settings.alerts_enabled && settings.alert_email) {
+              await sendCrashAlert(settings.alert_email, bot.name, code);
             }
+          }
+
+          if (shouldRestart && code !== 0) {
+            if (io) io.to(`bot-${bot.id}`).emit('bot-log', { botId: bot.id, message: `[SYSTEM] Auto-restart enabled. Restarting bot in 5 seconds...`, timestamp: new Date() });
+            setTimeout(() => {
+              this.startBot(containerId, bot, io, pool).catch(e => {
+                if (io) io.to(`bot-${bot.id}`).emit('bot-log', { botId: bot.id, message: `[ERROR] Auto-restart failed: ${e.message}`, timestamp: new Date() });
+              });
+            }, 5000);
+          } else {
+            await pool.query("UPDATE bots SET status = 'stopped' WHERE id = $1", [bot.id]); 
           }
         } catch (e) {
           console.error("Failed to handle process exit database/mail logic:", e);
