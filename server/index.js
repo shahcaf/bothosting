@@ -79,8 +79,18 @@ const pool = {
 
     if (this.isPG) {
       await this.db.query(schema);
+      // Migration: Add discord columns if they don't exist (using Postgres logic)
+      try {
+        await this.db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discord_id TEXT');
+        await this.db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT');
+        await this.db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS discriminator TEXT');
+        await this.db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT');
+      } catch (e) {
+        console.log('[DB] Migration skip (columns likely exist)');
+      }
     } else {
       await this.db.exec(schema);
+      // SQLite migration is harder, but usually handled by schema recreate if fresh
     }
   },
 
