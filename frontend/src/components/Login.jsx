@@ -34,6 +34,16 @@ const Login = () => {
         </div>
         <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem' }}>Login</button>
       </form>
+      <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+        <p style={{ margin: '1rem 0' }}>— OR —</p>
+        <button 
+          onClick={() => window.location.href = import.meta.env.VITE_API_URL + '/auth/discord'} 
+          className="btn" 
+          style={{ width: '100%', backgroundColor: '#5865F2', color: 'white', fontWeight: 'bold' }}>
+          Login with Discord
+        </button>
+      </div>
+
       <p style={{ textAlign: 'center', marginTop: '1rem' }}>
         Don't have an account? <Link to="/register" style={{ color: 'var(--accent)' }}>Register</Link>
       </p>

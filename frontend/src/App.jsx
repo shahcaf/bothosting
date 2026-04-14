@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import BotControl from './components/BotControl';
 import Monitor from './components/Monitor';
 import Landing from './components/Landing';
+import AuthCallback from './components/AuthCallback';
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('token');
@@ -32,6 +33,7 @@ function App() {
         </nav>
         <main className="container">
           <Routes>
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
             <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
             <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
