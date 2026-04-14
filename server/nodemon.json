@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    "bots/**",
+    "uploads/**",
+    "database.sqlite",
+    "database.sqlite-journal"
+  ]
+}

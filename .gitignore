@@ -1,0 +1,40 @@
+# Dependency directories
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+server/node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database
+server/database.sqlite
+server/database.sqlite-journal
+*.sqlite
+*.db
+
+# Bot storage (actual host data)
+server/bots/
+bots/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Build output
+frontend/dist/
+dist/
+build/

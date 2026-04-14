@@ -1,0 +1,13 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install standard dependencies
+RUN apk add --no-cache python3 make g++ git
+
+# Copy default scripts if any (not really needed if user uploads everything)
+# CMD will be overridden or use a generic one
+
+EXPOSE 3000-4000
+
+CMD ["node", "index.js"]
