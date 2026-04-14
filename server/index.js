@@ -122,6 +122,7 @@ passport.use(new DiscordStrategy({
     scope: ['identify']
   },
   async (accessToken, refreshToken, profile, done) => {
+    console.log('[OAUTH] Login attempt started for:', profile.username);
     try {
       // Find or create user in CockroachDB
       const res = await pool.query('SELECT * FROM users WHERE discord_id = $1', [profile.id]);
@@ -238,6 +239,7 @@ app.get('/api/ping', (req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[OAUTH] Configured Redirect URI: ${process.env.DISCORD_REDIRECT_URI}`);
     
     // Internal Keep-Alive interval (every 14 minutes)
     // Helps prevent the server from sleeping on Render/Railway free tiers
