@@ -64,10 +64,12 @@ router.get('/discord/callback', (req, res, next) => {
         });
     })(req, res, next);
 }, (req, res) => {
-    // Generate JWT (optional, but good for react frontend)
+    // Generate JWT
     const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    // Redirect to frontend with token
+    // Redirect to frontend (Frontend will pull token from URL once more for simplicity, 
+    // but we can also use a temporary storage if the red screen persists)
     const frontendUrl = process.env.FRONTEND_REDIRECT_URI || 'http://localhost:5173/auth/callback';
+    // We'll keep the token in query for now but shorten it or use a simpler redirect
     res.redirect(`${frontendUrl}?token=${token}`);
 });
 
