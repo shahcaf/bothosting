@@ -129,11 +129,12 @@ passport.use(new DiscordStrategy({
 
       if (!user) {
         const newUserQuery = `
-          INSERT INTO users (discord_id, username, discriminator, avatar)
-          VALUES ($1, $2, $3, $4)
+          INSERT INTO users (id, discord_id, username, discriminator, avatar)
+          VALUES ($1, $2, $3, $4, $5)
           RETURNING *
         `;
         const insertRes = await pool.query(newUserQuery, [
+          require('crypto').randomUUID(),
           profile.id,
           profile.username,
           profile.discriminator,
