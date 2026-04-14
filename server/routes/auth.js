@@ -54,9 +54,16 @@ router.get('/profile', (req, res) => {
 router.get('/discord', passport.authenticate('discord'));
 
 // Discord auth callback
-router.get('/discord/callback', passport.authenticate('discord', {
-    failureRedirect: '/'
-}), (req, res) => {
+router.get('/discord/callback', (req, res, next) => {
+    passport.authenticate('discord', (err, user, info) => {
+        if (err) return res.status(500).send("OAuth Error: " + err.message);
+        if (!user) return res.status(401).send("Authentication failed. " + (info ? JSON.stringify(info) : "Check Client Secret and Redirect URIs."));
+        req.logIn(user, (err) => {
+            if (err) return res.status(500).send("Login Error: " + err.message);
+            next();
+        });
+    })(req, res, next);
+}, (req, res) => {
     // Generate JWT (optional, but good for react frontend)
     const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     // Redirect to frontend with token
