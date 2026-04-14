@@ -8,8 +8,6 @@ const { Server } = require('socket.io');
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
 const session = require('express-session');
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
 const jwt = require('jsonwebtoken');
 
 const app = express();
@@ -37,6 +35,8 @@ const pool = {
       });
     } else {
       console.log('[DB] Using SQLite (Local)');
+      const sqlite3 = require('sqlite3');
+      const { open } = require('sqlite');
       this.db = await open({
         filename: './database.sqlite',
         driver: sqlite3.Database
